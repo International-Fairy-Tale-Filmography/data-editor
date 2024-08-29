@@ -3,7 +3,6 @@
 @using DataEditor.Core.Configuration
 <h3>SetToken</h3>
 @inject GitService _service
-@inject CoreSettingsModel _settings
 @inject ISnackbar Snackbar
 
 <MudTextField T="string" Label="Access Token" @bind-Value="_editSettings.AccessToken"></MudTextField>
@@ -16,11 +15,13 @@
 <MudButton OnClick="Save" Variant="Variant.Filled" Color="Color.Primary">Save</MudButton>
 @code {
 
-
+    CoreSettingsModel _settings;
     CoreSettingsModel _editSettings = new();
 
     protected override async Task OnInitializedAsync()
     {
+        _settings = await _service.GetConfiguration();
+
         _editSettings.AccessToken = _settings.AccessToken;
         _editSettings.Owner = _settings.Owner;
         _editSettings.RepoName = _settings.RepoName;
@@ -28,15 +29,9 @@
         _editSettings.Folder = _settings.Folder;
     }
 
-    public void Save()
+    public async Task Save()
     {
-        _settings.AccessToken = _editSettings.AccessToken;
-        _settings.Owner = _editSettings.Owner;
-        _settings.RepoName = _editSettings.RepoName;
-        _settings.Branch = _editSettings.Branch;
-        _settings.Folder = _editSettings.Folder;
-
-        _service.ApplyConfiguration();
+        await _service.SaveConfiguration(_editSettings);
         Snackbar.Add("Token Saved!", Severity.Success);
     }
 }

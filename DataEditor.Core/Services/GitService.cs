@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.JSInterop;
+using System.Runtime;
 
 namespace DataEditor.Core.Services
 {
@@ -14,16 +16,35 @@ namespace DataEditor.Core.Services
     {
         private readonly GitHubClient _gitHubClient;
         public CoreSettingsModel _coreSettings;
-        public GitService(CoreSettingsModel settings)
+        private readonly IJSRuntime _jsRuntime;
+
+        public GitService(CoreSettingsModel settings, IJSRuntime jsRuntime)
         {
             _coreSettings = settings;
-            _gitHubClient = new GitHubClient(new ProductHeaderValue("MyCoolApp"));
+            _jsRuntime = jsRuntime;
+
+            _gitHubClient = new GitHubClient(new ProductHeaderValue("IFTF"));
         }
 
-        
-
-        public void ApplyConfiguration()
+        public async Task<CoreSettingsModel> GetConfiguration()
         {
+
+            //var githubAccessToken = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "github_accesstoken");
+            //_coreSettings.AccessToken = githubAccessToken;
+
+            return _coreSettings;
+        }
+
+        public async Task SaveConfiguration(CoreSettingsModel settings)
+        {
+            _coreSettings.AccessToken = settings.AccessToken;
+            _coreSettings.Owner = settings.Owner;
+            _coreSettings.RepoName = settings.RepoName;
+            _coreSettings.Branch = settings.Branch;
+            _coreSettings.Folder = settings.Folder;
+
+            //await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "github_accesstoken", _coreSettings.AccessToken);
+
             _gitHubClient.Credentials = new Credentials(_coreSettings.AccessToken);
         }
 
@@ -36,6 +57,8 @@ namespace DataEditor.Core.Services
 
         public async Task<RepositoryContent> GetFile(string filename)
         {
+            await GetConfiguration();
+
             var filePath = Path.Combine(_coreSettings.Folder, filename);
             var fileDetails = await _gitHubClient.Repository.Content.GetAllContentsByRef(
                 _coreSettings.Owner, 
