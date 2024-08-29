@@ -7,13 +7,11 @@
 
 <h3>Edit File</h3>
 
-<MudButton   OnClick="Refresh" Variant="Variant.Filled" Color="Color.Primary">Refresh</MudButton>
+<MudButton OnClick="Refresh" Variant="Variant.Filled" Color="Color.Primary">Refresh - @file?.Sha</MudButton>
 
 <MudButton Disabled="(file == null)"  OnClick="Save" Variant="Variant.Filled" Color="Color.Primary">Save</MudButton>
 
 <MudTextField Disabled="(file == null)" T="string" @bind-Value="content" Variant="Variant.Outlined" Lines="10"></MudTextField>
-
-
 
 @code {
     string content;
