@@ -1,0 +1,42 @@
+﻿@page "/Settings"
+@using DataEditor.Core.Services
+@using DataEditor.Core.Configuration
+<h3>SetToken</h3>
+@inject GitService _service
+@inject CoreSettingsModel _settings
+@inject ISnackbar Snackbar
+
+<MudTextField T="string" Label="Access Token" @bind-Value="_editSettings.AccessToken"></MudTextField>
+<MudTextField T="string" Label="Owner" @bind-Value="_editSettings.Owner"></MudTextField>
+<MudTextField T="string" Label="Repo Name" @bind-Value="_editSettings.RepoName"></MudTextField>
+<MudTextField T="string" Label="Branch" @bind-Value="_editSettings.Branch"></MudTextField>
+<MudTextField T="string" Label="Folder" @bind-Value="_editSettings.Folder"></MudTextField>
+
+
+<MudButton OnClick="Save" Variant="Variant.Filled" Color="Color.Primary">Save</MudButton>
+@code {
+
+
+    CoreSettingsModel _editSettings = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _editSettings.AccessToken = _settings.AccessToken;
+        _editSettings.Owner = _settings.Owner;
+        _editSettings.RepoName = _settings.RepoName;
+        _editSettings.Branch = _settings.Branch;
+        _editSettings.Folder = _settings.Folder;
+    }
+
+    public void Save()
+    {
+        _settings.AccessToken = _editSettings.AccessToken;
+        _settings.Owner = _editSettings.Owner;
+        _settings.RepoName = _editSettings.RepoName;
+        _settings.Branch = _editSettings.Branch;
+        _settings.Folder = _editSettings.Folder;
+
+        _service.ApplyConfiguration();
+        Snackbar.Add("Token Saved!", Severity.Success);
+    }
+}
