@@ -10,10 +10,14 @@ namespace DataEditor.Core.Services
     public class GitService
     {
         private GitHubClient gitHubClient;
-        public GitService() 
+        public GitService()
         {
             gitHubClient = new GitHubClient(new ProductHeaderValue("MyCoolApp"));
-           
+        }
+
+        public void SetCredentials(string accessToken)
+        {
+            gitHubClient.Credentials = new Credentials(accessToken);
         }
 
         public async Task<string> GetUser()
@@ -22,5 +26,6 @@ namespace DataEditor.Core.Services
 
             return user.Login;
         }
+
     }
 }
